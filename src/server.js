@@ -47,6 +47,16 @@ app.post('/api/scrape', async (req, res) => {
   }
 });
 
+// Optional convenience GET trigger (use cautiously)
+app.get('/api/scrape', async (req, res) => {
+  try {
+    const result = await scrapeEncar();
+    res.json({ ok: true, ...result });
+  } catch (e) {
+    res.status(500).json({ ok: false, error: e.message });
+  }
+});
+
 // Schedule daily at 03:00 server time
 cron.schedule('0 3 * * *', async () => {
   try {
@@ -59,8 +69,20 @@ cron.schedule('0 3 * * *', async () => {
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`Server listening on http://localhost:${PORT}`);
+  // Prime data on cold start if empty or if FORCE_SCRAPE_ON_START is set
+  try {
+    const data = await readCars();
+    const force = process.env.FORCE_SCRAPE_ON_START === '1';
+    if (force || !data || !Array.isArray(data.cars) || data.cars.length === 0) {
+      console.log('[startup] Performing initial scrape...');
+      await scrapeEncar();
+      console.log('[startup] Initial scrape complete');
+    }
+  } catch (e) {
+    console.error('[startup] Initial scrape failed', e);
+  }
 });
 
 
