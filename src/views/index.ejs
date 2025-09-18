@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ENCar Listings</title>
+  <link rel="stylesheet" href="/public/styles.css">
+</head>
+<body>
+  <header class="container">
+    <h1>ENCar Listings</h1>
+    <p>Updated: <%= data.scrapedAt ? new Date(data.scrapedAt).toLocaleString() : 'never' %></p>
+  </header>
+  <main class="container">
+    <div class="grid">
+      <% if (data.cars && data.cars.length) { %>
+        <% data.cars.forEach(car => { %>
+          <article class="card">
+            <a href="<%= car.link %>" target="_blank" rel="noopener">
+              <img src="<%= car.photo %>" alt="<%= car.brand %> <%= car.model %>" loading="lazy" />
+            </a>
+            <div class="card-body">
+              <h2><%= car.brand %> <%= car.model %></h2>
+              <p class="meta">
+                <span><%= car.year || '-' %></span>
+                <span><%= car.mileage || '-' %></span>
+              </p>
+              <p class="price"><%= car.price || '-' %></p>
+              <div class="actions">
+                <a class="btn" href="<%= car.link %>" target="_blank" rel="noopener">View</a>
+              </div>
+            </div>
+          </article>
+        <% }) %>
+      <% } else { %>
+        <p>No cars available yet. Please check back soon.</p>
+      <% } %>
+    </div>
+  </main>
+  <footer class="container foot">
+    <p>&copy; <%= new Date().getFullYear() %> ENCar Demo</p>
+  </footer>
+  <script defer src="/public/app.js"></script>
+</body>
+<!-- Note: This is a demo aggregator for assessment. Respect ENCAR terms of use. -->
+</html>
+
+
